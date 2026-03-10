@@ -45,17 +45,63 @@
  *   // => [{ rating: 5 }, { rating: 3 }]
  */
 export function createFilter(field, operator, value) {
-  // Your code here
+  return (item) => {
+    switch (operator) {
+      case '>':
+        return item[field] > value;
+      case '<':
+        return item[field] < value;
+      case '>=':
+        return item[field] >= value;
+      case '<=':
+        return item[field] <= value;
+      case '===':
+        return item[field] === value;
+      default:
+        return false;
+    }
+  };
 }
 
 export function createSorter(field, order = "asc") {
-  // Your code here
+  return (a, b) => {
+    const left = a[field];
+    const right = b[field];
+
+    let comparison = 0;
+    if (typeof left === 'string' && typeof right === 'string') {
+      comparison = left.localeCompare(right);
+    } else if (left > right) {
+      comparison = 1;
+    } else if (left < right) {
+      comparison = -1;
+    }
+
+    return order === 'desc' ? -comparison : comparison;
+  };
 }
 
 export function createMapper(fields) {
-  // Your code here
+  return (obj) => {
+    const mapped = {};
+
+    for (const field of fields) {
+      if (Object.prototype.hasOwnProperty.call(obj, field)) {
+        mapped[field] = obj[field];
+      }
+    }
+
+    return mapped;
+  };
 }
 
 export function applyOperations(data, ...operations) {
-  // Your code here
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return operations.reduce(
+    (result, operation) => (typeof operation === 'function' ? operation(result) : result),
+    data
+  );
 }
